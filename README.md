@@ -23,9 +23,6 @@ names = ["Insan", "Fare", "Balik"]
 
 msa, msa_names = align(sequences, names, k=3)
 
-for name, seq in zip(msa_names, msa):
-    print(f"{name}: {seq}")
-
 Çıktı:
 Insan: ACGT--AGCT
 Fare:  AC-T--AGCT
