@@ -49,4 +49,4 @@ TTGCAGCTGAC
 
 ## Geliştirici
 
-Sevval Erel
+Şevval Erel
