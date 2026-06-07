@@ -22,7 +22,6 @@ def merge_clusters(matrix, labels, i, j):
 
     for k in range(n):
         if k != i and k != j:
-            # Ortalama mesafe hesapla
             new_dist = (matrix[i][k] + matrix[j][k]) / 2
             new_row.append(new_dist)
 
@@ -66,15 +65,3 @@ def upgma(matrix, labels):
 
     print(f"Guide Tree: {labels[0]}")
     return labels[0], merge_order  
-
-
-if __name__ == "__main__":
-    matrix = [
-        [0.0, 0.8, 1.0],
-        [0.8, 0.0, 0.8],
-        [1.0, 0.8, 0.0]
-    ]
-    labels = ["Dizi1", "Dizi2", "Dizi3"]
-
-    tree, merge_order = upgma(matrix, labels)
-    print(f"Merge sırası: {merge_order}")

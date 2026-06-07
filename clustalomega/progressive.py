@@ -71,9 +71,12 @@ def progressive(sequences, names, merge_order):
             result_seqs  = [new_aligned] + updated
             result_names = [nams1[0]] + list(nams2)
         else:
-            updated, new_aligned = align_to_profile(seqs1, seqs2[0])
-            result_seqs  = updated + [new_aligned]
-            result_names = list(nams1) + [nams2[0]]
+            result_seqs  = list(seqs1)
+            result_names = list(nams1)
+            for seq, name in zip(seqs2, nams2):
+                updated, new_aligned = align_to_profile(result_seqs, seq)
+                result_seqs  = updated + [new_aligned]
+                result_names = result_names + [name]
 
         new_label = f"({label1},{label2})"
         aligned_seqs_dict[new_label]  = result_seqs

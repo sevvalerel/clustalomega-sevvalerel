@@ -31,10 +31,8 @@ def emission(profile_col, base):
         return 0.0
     return profile_col.get(base, PSEUDO)
 
-def viterbi(profile, sequence):
-    n = len(sequence)
-    m = len(profile)
-
+def viterbi_init(n, m):
+    """Tabloları oluşturur ve başlangıç değerlerini koyar"""
     M = [[0.0]*(m+1) for _ in range(n+1)]
     I = [[0.0]*(m+1) for _ in range(n+1)]
     D = [[0.0]*(m+1) for _ in range(n+1)]
@@ -56,6 +54,14 @@ def viterbi(profile, sequence):
         v2 = I[i-1][0] * TRANSITION['II']
         I[i][0] = max(v1, v2)
         I_back[i][0] = 'M' if v1 >= v2 else 'I'
+
+    return M, I, D, M_back, I_back, D_back
+
+
+def viterbi_fill(profile, sequence, M, I, D, M_back, I_back, D_back):
+    """Her (i,j) hücresi için M, I, D skorlarını hesaplar"""
+    n = len(sequence)
+    m = len(profile)
 
     for i in range(1, n+1):
         for j in range(1, m+1):
@@ -87,11 +93,19 @@ def viterbi(profile, sequence):
             D[i][j] = best_d[0]
             D_back[i][j] = best_d[1]
 
+    return M, I, D, M_back, I_back, D_back
+
+
+def viterbi_traceback(sequence, M, I, D, M_back, I_back, D_back):
+    """En sondan başa giderek hizalamayı oluşturur"""
+    n = len(sequence)
+    m = len(M[0]) - 1
+
     seq_aligned  = []
     gaps_in_prof = []
     i, j = n, m
 
-    scores = [(M[n][m],'M'), (I[n][m],'I'), (D[n][m],'D')]
+    scores = [(M[n][m], 'M'), (I[n][m], 'I'), (D[n][m], 'D')]
     current = max(scores, key=lambda x: x[0])[1]
 
     while i > 0 or j > 0:
@@ -114,7 +128,7 @@ def viterbi(profile, sequence):
             gaps_in_prof.append(True)
             current = I_back[i][j]
             i -= 1
-        else:  # D
+        else:  
             seq_aligned.append('-')
             gaps_in_prof.append(False)
             current = D_back[i][j]
@@ -122,5 +136,17 @@ def viterbi(profile, sequence):
 
     seq_aligned  = ''.join(reversed(seq_aligned))
     gaps_in_prof = list(reversed(gaps_in_prof))
+
+    return seq_aligned, gaps_in_prof
+
+
+def viterbi(profile, sequence):
+    """Ana Viterbi fonksiyonu — üç adımı sırayla çağırır"""
+    n = len(sequence)
+    m = len(profile)
+
+    M, I, D, M_back, I_back, D_back = viterbi_init(n, m)
+    M, I, D, M_back, I_back, D_back = viterbi_fill(profile, sequence, M, I, D, M_back, I_back, D_back)
+    seq_aligned, gaps_in_prof = viterbi_traceback(sequence, M, I, D, M_back, I_back, D_back)
 
     return seq_aligned, gaps_in_prof
